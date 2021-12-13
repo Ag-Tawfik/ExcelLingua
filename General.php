@@ -3,7 +3,6 @@ header("Location: index.php");
 require_once 'vendor\src\SimpleXLS.php';
 require_once 'vendor\src\SimpleXLSX.php';
 
-
 $my_languages = [
     'en' => 'English',
     'tr' => 'Türkçe',
@@ -17,7 +16,7 @@ foreach ($my_languages as $key => $value) {
 
 $countfiles = count($_FILES['uploadedFile']['name']);
 
-for($i=0;$i<$countfiles;$i++){
+for ($i = 0; $i < $countfiles; $i++) {
 
     $filename = $_FILES['uploadedFile']['name'][$i];
 
@@ -25,7 +24,7 @@ for($i=0;$i<$countfiles;$i++){
 
     get_file([
         'tmp_name' => $tmp_name,
-        'name' => $filename
+        'name' => $filename,
     ]);
 }
 
@@ -35,19 +34,34 @@ function get_file($file): void
 
     $rows = Xls_converter($dest_path);
 
-    filtered_by_lang($rows, $fileName);
+    $TransposeArray = array_transpose($rows);
+
+    splite_array_by_lang($TransposeArray, $fileName);
 
 }
 
-function filtered_by_lang(array $rows, $fileName): void
+function array_transpose(array $rows): array
+{
+    $output = [];
+
+    foreach ($GLOBALS['my_languages'] as $l) {
+        $output[$l] = [];
+    }
+
+    foreach ($rows as $d) {
+        foreach ($GLOBALS['my_languages'] as $la) {
+            $output[$la] += [
+                $d[''] => $d[$la],
+            ];
+        }
+    }
+    return $output;
+}
+
+function splite_array_by_lang(array $rows, $fileName): void
 {
     foreach ($GLOBALS['my_languages'] as $key => $value) {
-        $filtered = multi_array_search_with_condition(
-            $rows,
-            array('' => $value)
-        );
-
-        $array = array_undot($filtered[0]);
+        $array = array_undot($rows[$value]);
 
         Save_file($key, $array, $fileName);
     }
@@ -98,26 +112,6 @@ function save_file($key, $array, $file_name)
     } else {
         file_put_contents("$key/$file_name.php", "<?php \n return " . var_export($array, true) . ";");
     }
-}
-
-function multi_array_search_with_condition($array, $condition): array
-{
-    $foundItems = array();
-
-    foreach ($array as $item) {
-        $find = true;
-        foreach ($condition as $key => $value) {
-            if (isset($item[$key]) && $item[$key] == $value) {
-                $find = true;
-            } else {
-                $find = false;
-            }
-        }
-        if ($find) {
-            array_push($foundItems, $item);
-        }
-    }
-    return $foundItems;
 }
 
 function array_undot($dottedArray)
