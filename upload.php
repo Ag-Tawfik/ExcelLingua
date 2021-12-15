@@ -18,17 +18,25 @@ $countfiles = count($_FILES['uploadedFile']['name']);
 
 for ($i = 0; $i < $countfiles; $i++) {
 
+    $fileType = $_FILES['uploadedFile']['type'][$i];
+
     $filename = $_FILES['uploadedFile']['name'][$i];
 
     $tmp_name = $_FILES['uploadedFile']['tmp_name'][$i];
 
+    if ($fileType != "application/vnd.ms-excel") {
+        echo "Only xls, xlsx files are allowed.";
+        continue;
+    }
+
     get_file([
         'tmp_name' => $tmp_name,
         'name' => $filename,
+        'type' => $fileType,
     ]);
 }
 
-function get_file($file): void
+function get_file($file)
 {
     list($fileName, $dest_path) = upload_file($file);
 
@@ -38,9 +46,11 @@ function get_file($file): void
 
     splite_array_by_lang($TransposeArray, $fileName);
 
+    unlink($dest_path);
+
 }
 
-function array_transpose(array $rows): array
+function array_transpose(array $rows)
 {
     $output = [];
 
@@ -58,7 +68,7 @@ function array_transpose(array $rows): array
     return $output;
 }
 
-function splite_array_by_lang(array $rows, $fileName): void
+function splite_array_by_lang(array $rows, $fileName)
 {
     foreach ($GLOBALS['my_languages'] as $key => $value) {
         $array = array_undot($rows[$value]);
@@ -67,7 +77,7 @@ function splite_array_by_lang(array $rows, $fileName): void
     }
 }
 
-function upload_file($file): array
+function upload_file($file)
 {
     $fileTmpPath = $file['tmp_name'];
 
@@ -75,17 +85,21 @@ function upload_file($file): array
 
     $fileNameCmps = explode(".", $fileName);
 
+    $fileExtension = strtolower(end($fileNameCmps)); //
+
+    $newFileName = md5(time() . $fileName) . '.' . $fileExtension; //
+
     $uploadFileDir = './uploaded_files/';
 
-    $dest_path = $uploadFileDir . $fileName;
+    $dest_path = $uploadFileDir . $newFileName; //
 
     move_uploaded_file($fileTmpPath, $dest_path);
 
-    return array($fileNameCmps[0], $dest_path);
+    return array($fileNameCmps[0], $dest_path, $fileExtension);
 
 }
 
-function Xls_converter($dest_path): array
+function Xls_converter($dest_path)
 {
     $xlsx = SimpleXLS::parse("$dest_path");
 
@@ -126,7 +140,7 @@ function array_undot($dottedArray)
     return $array;
 }
 
-function array_set(array &$array, ?string $key, $value): array
+function array_set(array &$array, ?string $key, $value)
 {
     if (is_null($key)) {
         return $array = $value;
