@@ -47,7 +47,6 @@ function get_file($file)
     splite_array_by_lang($TransposeArray, $fileName);
 
     unlink($dest_path);
-
 }
 
 function array_transpose(array $rows)
@@ -85,18 +84,17 @@ function upload_file($file)
 
     $fileNameCmps = explode(".", $fileName);
 
-    $fileExtension = strtolower(end($fileNameCmps)); //
+    $fileExtension = strtolower(end($fileNameCmps));
 
-    $newFileName = md5(time() . $fileName) . '.' . $fileExtension; //
+    $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
 
-    $uploadFileDir = './uploaded_files/';
+    $uploadFileDir = './';
 
-    $dest_path = $uploadFileDir . $newFileName; //
+    $dest_path = $uploadFileDir . $newFileName;
 
     move_uploaded_file($fileTmpPath, $dest_path);
 
     return array($fileNameCmps[0], $dest_path, $fileExtension);
-
 }
 
 function Xls_converter($dest_path)
@@ -114,7 +112,6 @@ function Xls_converter($dest_path)
     }
 
     return $rows;
-
 }
 
 function save_file($key, $array, $file_name)
