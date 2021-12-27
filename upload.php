@@ -29,14 +29,14 @@ for ($i = 0; $i < $countfiles; $i++) {
         continue;
     }
 
-    get_file([
+    file_manipulate([
         'tmp_name' => $tmp_name,
         'name' => $filename,
         'type' => $fileType,
     ]);
 }
 
-function get_file($file)
+function file_manipulate($file)
 {
     list($fileName, $dest_path) = upload_file($file);
 
