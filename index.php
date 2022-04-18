@@ -10,7 +10,7 @@
     <form method="POST" action="upload.php" enctype="multipart/form-data">
         <div>
             <h1 style="color:rgb(117, 59, 17);">Upload XLS/XLSX File : </h1><br>
-            <input type="file" name="uploadedFile[]" accept=".xls, .xlsx/*" multiple="multiple" style="padding: 10px 20px; border: 2px solid rgb(117, 59, 17); border-radius: 10px;cursor: pointer"/>
+            <input type="file" name="uploadedFile[]" accept=".xlsx, .xls" multiple="multiple" style="padding: 10px 20px; border: 2px solid rgb(117, 59, 17); border-radius: 10px;cursor: pointer"/>
         </div><br>
         <input type="submit" name="uploadBtn" value="Json" style="background-color: rgb(201, 115, 54); padding: 10px 50px; border: none; border-radius: 10px;cursor: pointer" />
         <input type="submit" name="uploadBtn" value="Array" style="background-color: rgb(201, 115, 54); padding: 10px 50px; border: none; border-radius: 10px;cursor: pointer;"/>
