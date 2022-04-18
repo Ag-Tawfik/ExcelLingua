@@ -2,7 +2,7 @@
 
 /** @noinspection MultiAssignmentUsageInspection */
 
-use SimpleXMLElement;
+//use SimpleXMLElement;
 
 /**
  *    SimpleXLSX php class
