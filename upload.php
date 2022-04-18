@@ -1,4 +1,10 @@
 <?php
+
+namespace Simple;
+
+use SimpleXLS;
+use SimpleXLSX;
+
 header("Location: index.php");
 require_once 'vendor\src\SimpleXLS.php';
 require_once 'vendor\src\SimpleXLSX.php';
@@ -24,9 +30,8 @@ for ($i = 0; $i < $countfiles; $i++) {
 
     $tmp_name = $_FILES['uploadedFile']['tmp_name'][$i];
 
-    if ($fileType != "application/vnd.ms-excel") {
-        echo "Only xls, xlsx files are allowed.";
-        continue;
+    if ($fileType != "application/vnd.ms-excel" && $fileType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        return false;
     }
 
     file_manipulate([
@@ -99,7 +104,7 @@ function upload_file($file)
 
 function Xls_converter($dest_path)
 {
-    $xlsx = SimpleXLS::parse("$dest_path");
+    $xlsx = SimpleXLSX::parse("$dest_path");
 
     $header_values = $rows = [];
 
@@ -116,6 +121,7 @@ function Xls_converter($dest_path)
 
 function save_file($key, $array, $file_name)
 {
+
     if ($_POST['uploadBtn'] == 'Json') {
         $trim = trim((json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), '[]');
 
