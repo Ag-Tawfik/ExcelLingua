@@ -1,87 +1,85 @@
 <?php
 
-namespace Simple;
+require($_SERVER['DOCUMENT_ROOT'] . '/vendor/src/SimpleXLS.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/vendor/src/SimpleXLSX.php');
 
-use SimpleXLS;
-use SimpleXLSX;
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    exit('not allowed');
+}
 
-header("Location: index.php");
-require_once 'vendor\src\SimpleXLS.php';
-require_once 'vendor\src\SimpleXLSX.php';
-
-$my_languages = [
+$myLanguages = [
     'en' => 'English',
     'tr' => 'Türkçe',
 ];
 
-foreach ($my_languages as $key => $value) {
+foreach ($myLanguages as $key => $value) {
     if (!is_dir($key)) {
         mkdir($key);
     }
 }
 
-$countfiles = count($_FILES['uploadedFile']['name']);
+$files = count($_FILES['uploadedFile']['name']);
 
-for ($i = 0; $i < $countfiles; $i++) {
+for ($i = 0; $i < $files; $i++) {
 
     $fileType = $_FILES['uploadedFile']['type'][$i];
 
-    $filename = $_FILES['uploadedFile']['name'][$i];
+    $fileName = $_FILES['uploadedFile']['name'][$i];
 
-    $tmp_name = $_FILES['uploadedFile']['tmp_name'][$i];
+    $tmpName = $_FILES['uploadedFile']['tmp_name'][$i];
 
     if ($fileType != "application/vnd.ms-excel" && $fileType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         return false;
     }
 
-    file_manipulate([
-        'tmp_name' => $tmp_name,
-        'name' => $filename,
+    fileManipulate([
+        'tmp_name' => $tmpName,
+        'name' => $fileName,
         'type' => $fileType,
     ]);
 }
 
-function file_manipulate($file)
+function fileManipulate($file)
 {
-    list($fileName, $dest_path) = upload_file($file);
+    list($fileName, $destPath) = uploadFile($file);
 
-    $rows = Xls_converter($dest_path);
+    $rows = excelConverter($destPath, $file['type']);
 
-    $TransposeArray = array_transpose($rows);
+    $transposeArray = arrayTranspose($rows);
 
-    splite_array_by_lang($TransposeArray, $fileName);
+    spliteArrayByLang($transposeArray, $fileName);
 
-    unlink($dest_path);
+    unlink($destPath);
 }
 
-function array_transpose(array $rows)
+function arrayTranspose(array $rows)
 {
     $output = [];
 
-    foreach ($GLOBALS['my_languages'] as $l) {
-        $output[$l] = [];
+    foreach ($GLOBALS['myLanguages'] as $language) {
+        $output[$language] = [];
     }
 
-    foreach ($rows as $d) {
-        foreach ($GLOBALS['my_languages'] as $la) {
-            $output[$la] += [
-                $d[''] => $d[$la],
+    foreach ($rows as $row) {
+        foreach ($GLOBALS['myLanguages'] as $language) {
+            $output[$language] += [
+                $row[''] => $row[$language],
             ];
         }
     }
     return $output;
 }
 
-function splite_array_by_lang(array $rows, $fileName)
+function spliteArrayByLang(array $rows, $fileName)
 {
-    foreach ($GLOBALS['my_languages'] as $key => $value) {
-        $array = array_undot($rows[$value]);
+    foreach ($GLOBALS['myLanguages'] as $key => $value) {
+        $array = arrayUndot($rows[$value]);
 
-        Save_file($key, $array, $fileName);
+        saveFile($key, $array, $fileName);
     }
 }
 
-function upload_file($file)
+function uploadFile($file)
 {
     $fileTmpPath = $file['tmp_name'];
 
@@ -95,16 +93,20 @@ function upload_file($file)
 
     $uploadFileDir = './';
 
-    $dest_path = $uploadFileDir . $newFileName;
+    $destPath = $uploadFileDir . $newFileName;
 
-    move_uploaded_file($fileTmpPath, $dest_path);
+    move_uploaded_file($fileTmpPath, $destPath);
 
-    return array($fileNameCmps[0], $dest_path, $fileExtension);
+    return array($fileNameCmps[0], $destPath, $fileExtension);
 }
 
-function Xls_converter($dest_path)
+function excelConverter($destPath, $fileType)
 {
-    $xlsx = SimpleXLSX::parse("$dest_path");
+    if ($fileType == 'application/vnd.ms-excel') {
+        $xlsx = SimpleXLS::parse("$destPath");
+    } else {
+        $xlsx = SimpleXLSX::parse("$destPath");
+    }
 
     $header_values = $rows = [];
 
@@ -119,7 +121,7 @@ function Xls_converter($dest_path)
     return $rows;
 }
 
-function save_file($key, $array, $file_name)
+function saveFile($key, $array, $file_name)
 {
 
     if ($_POST['uploadBtn'] == 'Json') {
@@ -131,19 +133,19 @@ function save_file($key, $array, $file_name)
     }
 }
 
-function array_undot($dottedArray)
+function arrayUndot($dottedArray)
 {
 
     $array = array();
 
     foreach ($dottedArray as $key => $value) {
-        array_set($array, $key, $value);
+        arraySet($array, $key, $value);
     }
 
     return $array;
 }
 
-function array_set(array &$array, ?string $key, $value)
+function arraySet(array &$array, ?string $key, $value)
 {
     if (is_null($key)) {
         return $array = $value;
@@ -169,3 +171,5 @@ function array_set(array &$array, ?string $key, $value)
 
     return $array;
 }
+
+header("Location: index.php");
