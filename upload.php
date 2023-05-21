@@ -4,7 +4,7 @@ require($_SERVER['DOCUMENT_ROOT'] . '/vendor/src/SimpleXLS.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/vendor/src/SimpleXLSX.php');
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    exit('not allowed');
+    header("Location: index.php");
 }
 
 $myLanguages = [
@@ -18,15 +18,15 @@ foreach ($myLanguages as $key => $value) {
     }
 }
 
-$files = count($_FILES['uploadedFile']['name']);
+$files = count($_FILES['files']['name']);
 
 for ($i = 0; $i < $files; $i++) {
 
-    $fileType = $_FILES['uploadedFile']['type'][$i];
+    $fileType = $_FILES['files']['type'][$i];
 
-    $fileName = $_FILES['uploadedFile']['name'][$i];
+    $fileName = $_FILES['files']['name'][$i];
 
-    $tmpName = $_FILES['uploadedFile']['tmp_name'][$i];
+    $tmpName = $_FILES['files']['tmp_name'][$i];
 
     if ($fileType != "application/vnd.ms-excel" && $fileType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         return false;
@@ -41,7 +41,7 @@ for ($i = 0; $i < $files; $i++) {
 
 function fileManipulate($file)
 {
-    list($fileName, $destPath) = uploadFile($file);
+    [$fileName, $destPath] = uploadFile($file);
 
     $rows = excelConverter($destPath, $file['type']);
 
@@ -108,28 +108,26 @@ function excelConverter($destPath, $fileType)
         $xlsx = SimpleXLSX::parse("$destPath");
     }
 
-    $header_values = $rows = [];
+    $headerValues = $rows = [];
 
     foreach ($xlsx->rows() as $k => $r) {
         if ($k === 0) {
-            $header_values = $r;
+            $headerValues = $r;
             continue;
         }
-        $rows[] = array_combine($header_values, $r);
+        $rows[] = array_combine($headerValues, $r);
     }
 
     return $rows;
 }
 
-function saveFile($key, $array, $file_name)
+function saveFile(string $key, array $array, string $fileName)
 {
-
-    if ($_POST['uploadBtn'] == 'Json') {
+    if (isset($_POST['submitJson'])) {
         $trim = trim((json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), '[]');
-
-        file_put_contents("$key/$file_name.json", $trim);
+        file_put_contents("$key/$fileName.json", $trim);
     } else {
-        file_put_contents("$key/$file_name.php", "<?php \n return " . var_export($array, true) . ";");
+        file_put_contents("$key/$fileName.php", "<?php \n return " . var_export($array, true) . ";");
     }
 }
 

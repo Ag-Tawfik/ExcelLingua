@@ -32,16 +32,12 @@
         }
     </style>
     <script>
-        function validateUpload() {
-            var x = document.forms["upload"]["uploadedFile[]"].value;
-            if (x == "" || x == null) {
+        const validateUpload = () => {
+            let files = document.getElementById("files").files;
+            if (files.length === 0) {
                 alert("Please choose a file or multiple files to upload");
                 return false;
             }
-        }
-
-        function clearInput() {
-            document.getElementById("uploadedFile").value = "";
         }
     </script>
 </head>
@@ -51,12 +47,11 @@
         <form name="upload" method="POST" action="upload.php" enctype="multipart/form-data" onsubmit="return validateUpload()" required>
             <div>
                 <h1>Upload XLS/XLSX File:</h1><br>
-                <input type="file" name="uploadedFile[]" accept=".xlsx, .xls" multiple>
+                <input type="file" id="files" name="files[]" accept=".xlsx, .xls" multiple>
             </div><br>
-            <input type="submit" name="uploadBtn" value="Json">
-            <input type="submit" name="uploadBtn" value="Array">
-
-            <button>Clear</button>
+            <input type="submit" name="submitJson" value="Json">
+            <input type="submit" name="submitArray" value="Array">
+            <input type="reset" value="Clear">
         </form>
     </center>
 </body>
