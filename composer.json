@@ -1,0 +1,28 @@
+{
+    "name": "excel-lingua/excel-translation-converter",
+    "description": "A web application that converts Excel files containing translations into structured language files",
+    "type": "project",
+    "require": {
+        "php": ">=8.4.6",
+        "shuchkin/simplexlsx": "^0.9.12",
+        "shuchkin/simplexls": "^0.9.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "ExcelLingua\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Taoufik AG",
+            "email": "info@excel-lingua.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "platform": {
+            "php": "8.4.6"
+        }
+    }
+} 
