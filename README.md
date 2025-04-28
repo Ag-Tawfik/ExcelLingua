@@ -17,9 +17,10 @@ ExcelLingua is a powerful web application that converts Excel files (XLS/XLSX) c
 
 ## Requirements
 
-- PHP 7.4 or higher
+- PHP 8.4.6 or higher
 - Web server (Apache/Nginx)
 - SimpleXLS and SimpleXLSX libraries (included in vendor directory)
+- Modern web browser with JavaScript enabled
 
 ## Installation
 
